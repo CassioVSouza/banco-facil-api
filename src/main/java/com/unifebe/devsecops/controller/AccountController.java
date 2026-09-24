@@ -10,7 +10,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 @RestController
 public class AccountController {
@@ -28,23 +27,24 @@ public class AccountController {
 
     @GetMapping("/conta")
     public String buscarConta(@RequestParam String id) throws SQLException {
-        Connection conn = DriverManager.getConnection("jdbc:h2:mem:test");
-        Statement stmt = conn.createStatement();
+        // Corrigido (SQL Injection): o parametro "id" e passado como parametro
+        // do PreparedStatement ("?"), e nao concatenado na string SQL. O driver
+        // o trata sempre como dado, nunca como parte do comando SQL.
+        // try-with-resources garante o fechamento da conexao e dos recursos.
+        try (Connection conn = DriverManager.getConnection("jdbc:h2:mem:test");
+             PreparedStatement stmt = conn.prepareStatement("SELECT nome FROM contas WHERE id = ?")) {
+            stmt.setString(1, id);
 
-        //FALHA (SQL Injection): o parametro "id" vem direto da requisicao HTTP
-        //e e concatenado na string SQL sem nenhuma sanitizacao/parametrizacao.
-        //Um atacante pode enviar, por exemplo, "1' OR '1'='1" para ler contas
-        //que nao deveria, ou "1'; DROP TABLE contas; --" para destruir dados.
-        ResultSet rs = stmt.executeQuery("SELECT * FROM contas WHERE id = '" + id + "'");
-
-        StringBuilder resultado = new StringBuilder();
-        while (rs.next()) {
-            resultado.append(rs.getString("nome")).append(" ");
+            StringBuilder resultado = new StringBuilder();
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    resultado.append(rs.getString("nome")).append(" ");
+                }
+            }
+            return resultado.toString();
         }
-        return resultado.toString();
     }
 
-    
 
     @GetMapping("/health")
     public String health() {
