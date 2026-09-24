@@ -166,15 +166,8 @@ jobs:
       - name: Checkout do codigo
         uses: actions/checkout@v4
 
-      - name: Configurar JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'maven'
-
-      - name: Empacotar aplicacao (gera o .jar)
-        run: mvn --batch-mode -DskipTests package
+      # O .jar e compilado dentro do Dockerfile (multi-stage build), por isso
+      # nao ha mais etapa de JDK/Maven neste job.
 
       - name: Normalizar nome da imagem (minusculo, exigido pelo GHCR)
         id: image
