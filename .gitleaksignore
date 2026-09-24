@@ -1,0 +1,8 @@
+# Achados reconhecidos do Gitleaks (formato commit:arquivo:regra:linha).
+# As chaves abaixo sao valores de EXEMPLO publicos e inofensivos (a chave AWS
+# e a de exemplo da documentacao oficial). Elas foram removidas do codigo
+# (AppConfig agora le variaveis de ambiente), mas continuam no historico do
+# commit inicial. Com um segredo real, o correto seria rotacionar a credencial
+# e reescrever o historico (git filter-repo/BFG + force-push).
+21dc3b3dce22770de1abfb33fe6dd527f212b72a:src/main/java/com/unifebe/devsecops/config/AppConfig.java:aws-access-token:14
+21dc3b3dce22770de1abfb33fe6dd527f212b72a:src/main/java/com/unifebe/devsecops/config/AppConfig.java:stripe-access-token:18
